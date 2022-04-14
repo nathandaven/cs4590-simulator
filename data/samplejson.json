@@ -1,0 +1,29 @@
+[
+  {
+    "skaterTotalPushes": "3",
+    "skaterPushPower": "3",
+    "skaterPopHeight": "15",
+    "skaterPopDistanceFromObstacle": "140",
+    "obstacleThickness": "25",
+    "obstacleHeight": "20",
+    "groundAngle": "0"
+  },
+  {
+    "skaterTotalPushes": "4",
+    "skaterPushPower": "4",
+    "skaterPopHeight": "15",
+    "skaterPopDistanceFromObstacle": "140",
+    "obstacleThickness": "25",
+    "obstacleHeight": "20",
+    "groundAngle": "-3"
+  },
+  {
+    "skaterTotalPushes": "3",
+    "skaterPushPower": "5",
+    "skaterPopHeight": "15",
+    "skaterPopDistanceFromObstacle": "140",
+    "obstacleThickness": "25",
+    "obstacleHeight": "20",
+    "groundAngle": "5"
+  }
+]
