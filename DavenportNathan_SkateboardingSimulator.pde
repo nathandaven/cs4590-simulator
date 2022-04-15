@@ -6,13 +6,6 @@ import java.util.*;
 import controlP5.*;
 
 
-TextToSpeechMaker ttsMaker; 
-
-//<import statements here>
-
-//to use this, copy notification.pde, notification_listener.pde and notification_server.pde from this sketch to yours.
-//Example usage below.
-
 //name of a file to load from the data directory
 String sampleJSON = "samplejson.json";
 Event currentEvent;
@@ -22,6 +15,7 @@ ControlP5 p5;
 
 // colors
 color backGood = color(30, 50, 30);
+color backWin  = color(90,100,70);
 color backFail = color(100, 50, 30);
 
 color active   = color(178, 235, 128);
@@ -38,22 +32,28 @@ Slider skaterPopDistanceFromObstacleSlider;
 Slider obstacleThicknessSlider;
 Slider obstacleHeightSlider;
 Slider groundAngleSlider;
+Slider masterVolumeSlider;
 
 RadioButton selector;
 
+Toggle recordToggle;
 Toggle manualModeToggle;
 Toggle gameModeToggle;
 Toggle blindModeToggle;
 Button runSimulatorButton;
+Button resetSimulatorButton;
+Button helpButton;
 
 // animation
 int time;
 boolean animationRunning;
 int ground = 300;
 
+boolean recordMode;
 boolean gameMode = false;
 boolean manualMode = false;
 boolean blindMode = false;
+boolean showHelp = false;
 
 
 // constants
@@ -83,38 +83,26 @@ boolean canPop;
 boolean canPush;
 boolean voicePlayed;
 boolean hasPopped;
+boolean playedLandSound;
+boolean boardHasCleared;
 
 // input
 boolean spacePressed;
 int userPopPower;
 int pushTimer;
 
-
+// i moved a lot of setup into their own methods and files for organization
 void setup() {
   // maximum window size used
   size(900, 750);
   
   // audio context
   ac = new AudioContext(); //ac is defined in helper_functions.pde
-
-  setupWaveplayers(); // sonification.pde
+  setupAudio(); // sonification.pde
   ac.start();
   
-
-  // text to speech
-
-  // this will create WAV files in your data directory from input speech 
-  // which you will then need to hook up to SamplePlayer Beads
-  ttsMaker = new TextToSpeechMaker();
-  
-  String exampleSpeech = "Text to speech enabled";
-  
-  //ttsExamplePlayback(exampleSpeech); 
-  //see ttsExamplePlayback below for usage
-
-
+  // creates a default event to prevent errors
   currentEvent = new Event(loadJSONArray(sampleJSON).getJSONObject(0));
-
 
   // create the user interface
   createUI();
@@ -149,9 +137,25 @@ void createUI() {
     .activate(0);
 
   runSimulatorButton = p5.addButton("runSimulator")
-    .setPosition(740, 530)
-    .setSize(140, 20)
-    .setLabel("Run Simulator (press R)")
+    .setPosition(750, 515)
+    .setSize(120, 20)
+    .setLabel("Run")
+    .setColorBackground(color(90,100,70))
+    .setColorForeground(color(88,185,88))
+    .setColorActive(color(178,235,128));
+
+  resetSimulatorButton = p5.addButton("resetSimulator")
+    .setPosition(750, 545)
+    .setSize(120, 20)
+    .setLabel("Reset")
+    .setColorBackground(color(90,100,70))
+    .setColorForeground(color(1100,120,90))
+    .setColorActive(color(178,235,128));
+
+  recordToggle = p5.addToggle("toggleRecordMode")
+    .setPosition(350, 530)
+    .setSize(50, 20)
+    .setLabel("Record Mode")
     .setColorBackground(color(90,100,70))
     .setColorForeground(color(148,235,128))
     .setColorActive(color(178,235,128));
@@ -163,7 +167,6 @@ void createUI() {
     .setColorBackground(color(90,100,70))
     .setColorForeground(color(148,235,128))
     .setColorActive(color(178,235,128));
-
 
   manualModeToggle = p5.addToggle("toggleManualMode")
     .setPosition(550, 530)
@@ -178,6 +181,15 @@ void createUI() {
     .setPosition(450, 530)
     .setSize(50, 20)
     .setLabel("Game Mode")
+    .setColorBackground(color(90,100,70))
+    .setColorForeground(color(148,235,128))
+    .setColorActive(color(178,235,128));
+
+
+  helpButton = p5.addButton("toggleHelp")
+    .setPosition(4, 4)
+    .setSize(15, 15)
+    .setLabel("?")
     .setColorBackground(color(90,100,70))
     .setColorForeground(color(148,235,128))
     .setColorActive(color(178,235,128));
@@ -262,6 +274,18 @@ void createUI() {
     .setColorValueLabel(color(90,100,7));
 
 
+  masterVolumeSlider = p5.addSlider("masterVolumeSlider")
+    .setPosition(450, 690)
+    .setSize(200, 20)
+    .setRange(0, 100.0)
+    .setValue(100.0)
+    .setLabel("Master Volume")
+    .setColorBackground(color(90,100,70))
+    .setColorForeground(color(148,235,128))
+    .setColorActive(color(178,235,128))
+    .setColorValueLabel(color(90,100,7));
+
+
 }
 
 // UI methods
@@ -292,6 +316,10 @@ void obstacleHeightSlider(int val) {
 
 void groundAngleSlider(int val) {
   currentEvent.groundAngle = val;
+}
+
+void masterVolumeSlider(float val) {
+  masterGainGlide.setValue(val / 100.0);
 }
 
 void resetSliderValues() {
@@ -339,6 +367,28 @@ void unlockSliderValues() {
     .setColorForeground(color(148,235,128));
 }
 
+
+void toggleRecordMode() {
+  
+  // TODO
+
+  if (!recordMode) {
+    createNewFile();
+    writeToFile(currentEvent.toString());
+
+  } else {
+    writeToFile("\nTotal Runs: " + str(totalSimulatorRuns));
+    writeToFile("Success rate: " + str((float) totalSuccessfulRuns / totalSimulatorRuns));
+    writeToFile("Game mode: " + str(gameMode));
+    writeToFile("Manual mode: " + str(manualMode));
+    writeToFile("Blind mode: " + str(blindMode));
+    writeToFile("\nEnd of file");
+    closeFile();
+  }
+
+  recordMode = !recordMode;
+}
+
 void toggleBlindMode() {
   blindMode = !blindMode;
 }
@@ -373,59 +423,45 @@ void toggleGameMode() {
   
 }
 
-void playbackSelector(int selection) {
-  animationRunning = false;
-  unlockSliderValues();
-  surface.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-  size(SCREEN_WIDTH, SCREEN_HEIGHT);
-  
-    
-
-    switch(selection){
-        case 0: // JSON 1
-          currentEvent = new Event(loadJSONArray(sampleJSON).getJSONObject(0));
-          println("JSON 1");
-
-            break;
-        case 1: // JSON 2
-          currentEvent = new Event(loadJSONArray(sampleJSON).getJSONObject(1));
-          println("JSON 2");
-
-
-            break;
-        case 2: // JSON 3
-          currentEvent = new Event(loadJSONArray(sampleJSON).getJSONObject(2));
-          println("JSON 3");
-            
-            
-
-            break;
-            /*
-        case 3: // Manual Slider
-          println("Manual");
-          surface.setSize(SCREEN_WIDTH, SCREEN_HEIGHT_EXPANDED);
-          size(SCREEN_WIDTH, SCREEN_HEIGHT_EXPANDED);
-          resetSliderValues();
-          //currentEvent = null;
-
-
-            break;
-        case 4: // Game
-          println("Game");
-          gameMode = true;
-          
-
-            break;*/
-        default:
-          println("No selection!");
-          break;
-
-    }
-
-    
+void toggleHelp() {
+  showHelp = !showHelp;
 }
 
-void runSimulator() {
+void playbackSelector(int selection) {
+  animationRunning = false;
+
+  if (!gameMode) {
+    surface.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+    size(SCREEN_WIDTH, SCREEN_HEIGHT);
+  } else {
+    resetSliderValues();
+    unlockSliderValues();
+  }
+  
+
+  switch(selection){
+    case 0: // JSON 1
+      currentEvent = new Event(loadJSONArray(sampleJSON).getJSONObject(0));
+      println("JSON 1");
+      break;
+
+    case 1: // JSON 2
+      currentEvent = new Event(loadJSONArray(sampleJSON).getJSONObject(1));
+      println("JSON 2");
+      break;
+
+    case 2: // JSON 3
+      currentEvent = new Event(loadJSONArray(sampleJSON).getJSONObject(2));
+      println("JSON 3");
+      break;
+
+    default:
+      println("No selection!");
+      break;
+  }
+}
+
+void resetSimulator() {
 
   // reset all values for new run
   time = 0;
@@ -434,7 +470,6 @@ void runSimulator() {
   boardY = BOARD_Y_INITIAL;
   boardYvelocity = 0;
   boardXvelocity = 0;
-  animationRunning = true;
   totalPushes = currentEvent.getSkaterTotalPushes();
   voicePlayed = false;
   pushTimer = 0;
@@ -443,8 +478,22 @@ void runSimulator() {
   canPop = true;
   back = backGood;
   hasPopped = false;
+  boardHasCleared = false;
+
+}
+
+void runSimulator() {
+  resetSimulator();
+
+  animationRunning = true;
+
   ttsExamplePlayback("Go!");
 
+  if (recordMode) {
+
+    writeToFile("\n\nRun #" + Integer.toString(totalSimulatorRuns) + "\n");
+    totalSimulatorRuns++;
+  }
 
   // only allow sliders to be modified between runs
   lockSliderValues(); 
@@ -453,27 +502,12 @@ void runSimulator() {
 void update() {
 
   // !! UPDATE SECTION
-
-  //!! variables
   
-
-
-  // ending animation if board goes off screen
-  if (boardX > SCREEN_WIDTH) {
-    animationRunning = false;
-  }
-
-  // updating board math
+  // during animation
   if(animationRunning) {
+    
     // incrementing time
     time++;
-
-    // visual effect
-    if (collisionWithObstacle() || (time > 500 && boardXvelocity == 0)) {
-      back = backFail;
-      animationRunning = false;
-      unlockSliderValues();
-    }
 
     // update sound info
     updateSound();
@@ -482,33 +516,84 @@ void update() {
     updateBoard();
 
 
-  } else {
+    // collision with obstacle
+    if (collisionWithObstacle() || (time > 500 && boardXvelocity == 0)) {
+      back = backFail;
+      animationRunning = false;
+      unlockSliderValues();
+
+      if ((time > 500 && boardXvelocity == 0)) {
+        ttsExamplePlayback("Ran out of time!");
+      } else {
+        ttsExamplePlayback("Collision!");
+      }
+    }
+
+
+  } else { // not during animation
 
     unlockSliderValues(); // allow user to change sliders;
-    masterGainGlide.setValue(0.0); // make it shut up
+    skaterPositionGainGlide.setValue(0);
 
   }
+
+  // checking conditions
+
+  if (boardX > OBSTACLE_X_INITIAL + currentEvent.getObstacleThickness() && animationRunning) {
+    boardHasCleared = true;
+  }
+
+  if (boardHasCleared && animationRunning && boardX > SCREEN_WIDTH) {
+    ttsExamplePlayback("Success!");
+    if (recordMode) {
+      totalSuccessfulRuns++;
+      writeToFile("time of success: " + str(time))
+    }
+    back = backWin;
+  }
+
+  // ending animation if board goes off screen
+  if (boardX > SCREEN_WIDTH) {
+    animationRunning = false;
+  }
+
 }
 
 void updateSound() {
 
-  /*
-  if (boardX > OBSTACLE_X_INITIAL + currentEvent.getObstacleThickness()) {
-    waveFrequency.setValue(0);
-  } else {
-    waveFrequency.setValue(boardX + 1000);
-  }
-  */
+  // while animation running
+  if (!boardHasCleared) {
 
-  /*
-  if (time % 10 == 0 || time % 20 == 0) {
-    println("aaaa");
-    masterGainGlide.setValue(1.0);
-  } else {
-    println("bbbb");
-    masterGainGlide.setValue(0.0);
+    // updating the pitch based on board's Y value
+    float pitch = 800 - (boardY);
+    skaterPositionGlide.setValue(pitch);
+
+
+
+    // using envelope to induce a beeping effect as board gets closer to obstacle
+    if (skaterPositionGain.getGain() == 0) { // checking if previous segment is complete
+      envelope.clear();
+
+      // defining sustain value for segment
+      int sustain =  300 - (boardX / 2);
+      if (sustain < 100) {
+        sustain = 100;
+      }
+
+      // adding segments to envelope
+      envelope.addSegment(1, 1, 1);      // attack
+      envelope.addSegment(0, sustain, 1); // release
+    }
+
+    // updates gain
+    skaterPositionGain.setGain(envelope);
+
+  } else { // when animation successful
+    envelope.clear();
+    skaterPositionGain.setGain(0);
+
+
   }
-  */
 }
 
 void updateBoard() {
@@ -524,16 +609,22 @@ void updateBoard() {
       
       boardXvelocity += currentEvent.getSkaterPushPower();
       pushTimer = time + PUSH_TIMING;
+      playSound(push);
       
       if (totalPushes > 0) {
         totalPushes--;
       }
     }
+
+
     // json pop
     if (boardX > OBSTACLE_X_INITIAL - currentEvent.getSkaterPopDistanceFromObstacle() && !hasPopped) {
       hasPopped = true;
       boardYvelocity = currentEvent.getSkaterPopHeight();
-      ttsExamplePlayback("Pop!");
+      playedLandSound = false;
+      //ttsExamplePlayback("Pop!");
+
+      playSound(pop);
     }
   }
 
@@ -544,10 +635,16 @@ void updateBoard() {
   if (boardY < BOARD_Y_INITIAL) {
     boardYvelocity -= boardYacceleration;
 
+
   } else {
     boardY = BOARD_Y_INITIAL;
     boardYvelocity = 0;
     canPop = true;
+
+    if(!playedLandSound) {
+      playSound(land);
+      playedLandSound = true;
+    }
   }
 
 
@@ -585,7 +682,7 @@ void draw() {
 
   // !! DRAW SECTION
   if (blindMode) {
-    background(color(20, 40, 20));
+    background(back); //color(20, 40, 20)
     fill(fore);
     stroke(fore);
     text("audio only mode enabled", SCREEN_WIDTH / 2 - 70, SCREEN_HEIGHT / 2 - 50);
@@ -607,7 +704,16 @@ void draw() {
         boardRoation = 0;
       }
 
+      // UI setup 
+      background(back);
+      
+
+      fill(color(90,100,70));
+      stroke(color(90,100,70));
       drawGround(0, ground, currentEvent.getGroundAngle());
+
+      fill(fore);
+      stroke(fore);
       drawBoard(boardX, boardY, boardRoation);
       drawObstacle(
         OBSTACLE_X_INITIAL, 
@@ -615,59 +721,75 @@ void draw() {
         currentEvent.getObstacleThickness(), 
         currentEvent.getObstacleHeight()
       );
-
     }
 
   }
 
-    
+  // ui section and background
+  fill(backGood);
+  rect(-5, 490, 910, 500);
+
   // text labels
   fill(color(255,255,255));
-  text("1, 2, 3 to select demo,          r to run simulation,          g for game mode,          m for manual mode,          b for blind mode", 100, 15);
-  if(gameMode) {
-    text("enter to push,          space to ollie (jump), hold to charge up ollie (jump)", 240, 480); 
-  }
   text("json demos:", 30, 520);
-  text("modes:", 450, 520);
+  text("modes:", 350, 520);
   text("manual sliders:", 30, 590);
+  
+  if (showHelp) {
+    text("1, 2, 3 to select demo,          r to run simulation,          g for game mode,          m for manual mode,          b for blind mode", 100, 15);
+    if(gameMode) {
+      text("enter to push,          space to ollie (jump), hold to charge up ollie (jump)", 240, 480); 
+    }
+
+    // debug text
+    text("time: " + str(time), 820, 15 + 575);
+    text("pop: " + str(userPopPower), 820, 45 + 575);
+    text("pushes: " + str(currentEvent.getSkaterTotalPushes()), 820, 55 + 575);
+    text("posY: " + str(boardY), 820, 65 + 575);
+    text("posX: " + str(boardX), 820, 75 + 575);
+    text("velX: " + str(boardXvelocity), 820, 85 + 575);
+  }
 
 
-  // debug text
-  text("time: " + str(time), 820, 15 + 575);
-  text("posX: " + str(boardX), 820, 25 + 575);
-  text("velX: " + str(boardXvelocity), 820, 35 + 575);
-  text("pop: " + str(userPopPower), 820, 45 + 575);
-  text("pushes: " + str(currentEvent.getSkaterTotalPushes()), 820, 55 + 575);
-  rect(0, 490, 900, 1);
+  //rect(0, 490, 900, 1);
+
 
 }
 
 void keyPressed() {
   
+  // select JSON demo
   if (int(key) > 48 && int(key) < 54) {
     playbackSelector(int(key) - 49);
     selector.activate(int(key) - 49);
   }
-  if (key == 'm') {
+
+  // toggle manual mode
+  if (key == 'm' || key == 'M') {
     manualModeToggle.setValue(!manualMode);
   }
 
-  if (key == 'g') {
+  // toggle game mode
+  if (key == 'g' || key == 'G') {
     gameModeToggle.setValue(!gameMode);
   }
 
-  if (key == 'b') {
+  // toggle blind mode
+  if (key == 'b' || key == 'B') {
     blindModeToggle.setValue(!blindMode);
+
   }
 
-  // reset
-  if (keyCode == 8) {
-    animationRunning = false;
+  // reset 
+  if (keyCode == 8) { // backspace key
+    resetSimulator();
   }
 
-  if (key == 'r') {
+  // run simulator
+  if (key == 'r' || key == 'R') {
     runSimulator();
   }
+
 
   if (gameMode) {
 
@@ -675,9 +797,8 @@ void keyPressed() {
     if (keyCode == 32 && canPop && !spacePressed) { // spacebar
       spacePressed = true;
       canPop = false;
-      
     } 
-    
+
     // push
     if (key == RETURN || key == ENTER && pushTimer < time && /* totalPushes > 0 && */ canPush && canPop) {
       boardXvelocity += currentEvent.getSkaterPushPower();
@@ -686,6 +807,11 @@ void keyPressed() {
       if (totalPushes > 0) {
         totalPushes--;
       }
+      if (recordMode) {
+        writeToFile("pushed at: " + str(boardX));
+      }
+
+      playSound(push);
     }
 
   }
@@ -699,8 +825,21 @@ void keyReleased() {
       spacePressed = false;
       boardYvelocity = userPopPower;
       // boardY -= BOARD_HEIGHT;    
+
+
+      if (recordMode) {
+        writeToFile("X position of pop " + str(boardX));
+        writeToFile("X velocity at pop: " + str(boardXvelocity));
+        writeToFile("height of pop: " + str(userPopPower));
+      }
+
       userPopPower = 0;
       canPop = false;
+
+      playSound(pop);
+      playedLandSound = false;
+
+
     }
 
     if (key == RETURN || key == ENTER) {
@@ -723,7 +862,9 @@ void drawGround(int x, int y, int rotation) {
     pushMatrix();
     translate(x, y);
     rotate(radians(rotation));
-    rect(0, 0, 1000, 5);
+      fill(color(90,100,70));
+      stroke(color(90,100,70));
+    rect(-50, 0, 1000, 500);
     popMatrix();
 }
 
@@ -769,28 +910,6 @@ void drawBoard(int x, int y, int rotation) {
   popMatrix();
 }
 
-
-void ttsExamplePlayback(String inputSpeech) {
-  //create TTS file and play it back immediately
-  //the SamplePlayer will remove itself when it is finished in this case
-  
-  String ttsFilePath = ttsMaker.createTTSWavFile(inputSpeech);
-  println("File created at " + ttsFilePath);
-  
-  //createTTSWavFile makes a new WAV file of name ttsX.wav, where X is a unique integer
-  //it returns the path relative to the sketch's data directory to the wav file
-  
-  //see helper_functions.pde for actual loading of the WAV file into a SamplePlayer
-  
-  SamplePlayer sp = getSamplePlayer(ttsFilePath, true); 
-  //true means it will delete itself when it is finished playing
-  //you may or may not want this behavior!
-  
-  ac.out.addInput(sp);
-  sp.setToLoopStart();
-  sp.start();
-  println("TTS: " + inputSpeech);
-}
 
 boolean collisionWithObstacle() {
 

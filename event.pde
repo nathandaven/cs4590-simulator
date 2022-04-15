@@ -21,7 +21,7 @@ class Event {
     this.groundAngle       = json.getInt("groundAngle");
     
     if (json.isNull("comment")) {
-      this.comment = "";
+      this.comment = "~";
     }
     else {
       this.comment = json.getString("comment");
@@ -38,4 +38,19 @@ class Event {
   public int getGroundAngle()       { return groundAngle; }
 
   public String getComment()        { return comment; }
+
+
+  public String toString() {
+      String output = "Current Event: \n\n";
+      output += "skaterTotalPushes:               " + getSkaterTotalPushes() + "\n";
+      output += "skaterPushPower:                 " + getSkaterPushPower() + "\n";
+      output += "skaterPopHeight:                 " + getSkaterPopHeight() + "\n";
+      output += "skaterPopDistanceFromObstacle:   " + getSkaterPopDistanceFromObstacle() + "\n";
+      output += "obstacleThickness:               " + getObstacleThickness() + "\n";
+      output += "obstacleHeight:                  " + getObstacleHeight() + "\n";
+      output += "groundAngle:                     " + getGroundAngle() + "\n";
+      
+      output += "comment:                         " + getComment() + "\n\n\n";
+      return output;
+    }
 }
