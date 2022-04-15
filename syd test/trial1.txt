@@ -1,0 +1,87 @@
+Current Event: 
+
+skaterTotalPushes:               3
+skaterPushPower:                 3
+skaterPopHeight:                 15
+skaterPopDistanceFromObstacle:   140
+obstacleThickness:               25
+obstacleHeight:                  20
+groundAngle:                     0
+comment:                         ~
+
+
+
+Run #0
+
+pushed at: 0
+pushed at: 159
+pushed at: 283
+failed (collision at time: 203)
+X position of pop 525
+X velocity at pop: 6
+height of pop: 15
+
+
+Run #1
+
+pushed at: 0
+pushed at: 98
+pushed at: 249
+failed (collision at time: 153)
+pushed at: 522
+X position of pop 522
+X velocity at pop: 10
+height of pop: 15
+
+
+Run #2
+
+pushed at: 0
+pushed at: 93
+pushed at: 464
+failed (collision at time: 174)
+X position of pop 527
+X velocity at pop: 7
+height of pop: 15
+
+
+Run #3
+
+pushed at: 0
+pushed at: 72
+X position of pop 458
+X velocity at pop: 4
+height of pop: 15
+failed (collision at time: 179)
+
+
+Run #4
+
+pushed at: 0
+pushed at: 58
+pushed at: 173
+X position of pop 467
+X velocity at pop: 7
+height of pop: 10
+failed (collision at time: 147)
+
+
+Run #5
+
+pushed at: 0
+pushed at: 73
+pushed at: 238
+X position of pop 512
+X velocity at pop: 7
+height of pop: 15
+time of success: 201
+
+
+
+Total Runs: 6
+Success rate: 0.16666667
+Game mode: true
+Manual mode: false
+Blind mode: false
+
+End of file

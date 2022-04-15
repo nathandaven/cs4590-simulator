@@ -36,7 +36,7 @@ Slider masterVolumeSlider;
 
 RadioButton selector;
 
-Toggle recordToggle;
+Toggle recordModeToggle;
 Toggle manualModeToggle;
 Toggle gameModeToggle;
 Toggle blindModeToggle;
@@ -152,7 +152,7 @@ void createUI() {
     .setColorForeground(color(1100,120,90))
     .setColorActive(color(178,235,128));
 
-  recordToggle = p5.addToggle("toggleRecordMode")
+  recordModeToggle = p5.addToggle("toggleRecordMode")
     .setPosition(350, 530)
     .setSize(50, 20)
     .setLabel("Record Mode")
@@ -377,7 +377,7 @@ void toggleRecordMode() {
     writeToFile(currentEvent.toString());
 
   } else {
-    writeToFile("\nTotal Runs: " + str(totalSimulatorRuns));
+    writeToFile("\n\n\nTotal Runs: " + str(totalSimulatorRuns));
     writeToFile("Success rate: " + str((float) totalSuccessfulRuns / totalSimulatorRuns));
     writeToFile("Game mode: " + str(gameMode));
     writeToFile("Manual mode: " + str(manualMode));
@@ -490,7 +490,7 @@ void runSimulator() {
   ttsExamplePlayback("Go!");
 
   if (recordMode) {
-
+    
     writeToFile("\n\nRun #" + Integer.toString(totalSimulatorRuns) + "\n");
     totalSimulatorRuns++;
   }
@@ -524,8 +524,10 @@ void update() {
 
       if ((time > 500 && boardXvelocity == 0)) {
         ttsExamplePlayback("Ran out of time!");
+        writeToFile("failed (ran out of time)");
       } else {
         ttsExamplePlayback("Collision!");
+        writeToFile("failed (collision at time: " + str(time) + ")");
       }
     }
 
@@ -790,6 +792,10 @@ void keyPressed() {
     runSimulator();
   }
 
+  // recordMode
+  if (keyCode == 9) {
+    recordModeToggle.setValue(!recordMode);
+  }
 
   if (gameMode) {
 

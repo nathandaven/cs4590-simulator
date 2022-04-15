@@ -50,7 +50,7 @@ class Event {
       output += "obstacleHeight:                  " + getObstacleHeight() + "\n";
       output += "groundAngle:                     " + getGroundAngle() + "\n";
       
-      output += "comment:                         " + getComment() + "\n\n\n";
+      output += "comment:                         " + getComment() + "\n";
       return output;
     }
 }
