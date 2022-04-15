@@ -547,7 +547,7 @@ void update() {
     ttsExamplePlayback("Success!");
     if (recordMode) {
       totalSuccessfulRuns++;
-      writeToFile("time of success: " + str(time))
+      writeToFile("time of success: " + str(time));
     }
     back = backWin;
   }

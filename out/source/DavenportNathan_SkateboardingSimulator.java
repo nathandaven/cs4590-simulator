@@ -516,7 +516,7 @@ public void runSimulator() {
 
   if (recordMode) {
 
-    writeToFile("Run #" + Integer.toString(totalSimulatorRuns) + "\n");
+    writeToFile("\n\nRun #" + Integer.toString(totalSimulatorRuns) + "\n");
     totalSimulatorRuns++;
   }
 
@@ -572,6 +572,7 @@ public void update() {
     ttsExamplePlayback("Success!");
     if (recordMode) {
       totalSuccessfulRuns++;
+      writeToFile("time of success: " + str(time));
     }
     back = backWin;
   }
