@@ -7,7 +7,9 @@ import controlP5.*;
 
 
 //name of a file to load from the data directory
-String sampleJSON = "samplejson.json";
+String flat = "flat.json";
+String incline = "incline.json";
+String decline = "decline.json";
 Event currentEvent;
 
 // objects
@@ -102,7 +104,7 @@ void setup() {
   ac.start();
   
   // creates a default event to prevent errors
-  currentEvent = new Event(loadJSONArray(sampleJSON).getJSONObject(0));
+  currentEvent = new Event(loadJSONArray(flat).getJSONObject(0));
 
   // create the user interface
   createUI();
@@ -119,7 +121,6 @@ void createUI() {
   p5 = new ControlP5(this);
 
   // visual buttons
-
 
   selector = p5.addRadioButton("playbackSelector")
     .setPosition(30,530)
@@ -376,14 +377,27 @@ void toggleRecordMode() {
     createNewFile();
     writeToFile(currentEvent.toString());
 
+    // lock manual mode while recording
+    lockSliderValues();
+    /* selector.lock()
+      .setColorForeground(color(200, 210, 200)); */
+    manualModeToggle.lock()
+      .setColorBackground(color(200, 210, 200));
+
   } else {
     writeToFile("\n\n\nTotal Runs: " + str(totalSimulatorRuns));
-    writeToFile("Success rate: " + str((float) totalSuccessfulRuns / totalSimulatorRuns));
-    writeToFile("Game mode: " + str(gameMode));
-    writeToFile("Manual mode: " + str(manualMode));
-    writeToFile("Blind mode: " + str(blindMode));
+    writeToFile("Success rate (overall): " + str((float) totalSuccessfulRuns / totalSimulatorRuns));
+    writeToFile("Success rate (Normal: " + str((float) totalSuccessfulRuns / totalNormalRuns));
+    writeToFile("Success rate (Blind): " + str((float) totalSuccessfulRunsBlind / totalBlindRuns));
     writeToFile("\nEnd of file");
     closeFile();
+
+    // unlock after
+    unlockSliderValues();
+    /* selector.unlock()
+      .setColorForeground(color(148,235,128)); */
+    manualModeToggle.unlock()
+    .setColorBackground(color(90,100,70));
   }
 
   recordMode = !recordMode;
@@ -430,7 +444,7 @@ void toggleHelp() {
 void playbackSelector(int selection) {
   animationRunning = false;
 
-  if (!gameMode) {
+  if (!manualMode) {
     surface.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
     size(SCREEN_WIDTH, SCREEN_HEIGHT);
   } else {
@@ -441,18 +455,18 @@ void playbackSelector(int selection) {
 
   switch(selection){
     case 0: // JSON 1
-      currentEvent = new Event(loadJSONArray(sampleJSON).getJSONObject(0));
-      println("JSON 1");
+      currentEvent = new Event(loadJSONArray(flat).getJSONObject(0));
+      println("JSON 1 loaded");
       break;
 
     case 1: // JSON 2
-      currentEvent = new Event(loadJSONArray(sampleJSON).getJSONObject(1));
-      println("JSON 2");
+      currentEvent = new Event(loadJSONArray(incline).getJSONObject(0));
+      println("JSON 2 loaded");
       break;
 
     case 2: // JSON 3
-      currentEvent = new Event(loadJSONArray(sampleJSON).getJSONObject(2));
-      println("JSON 3");
+      currentEvent = new Event(loadJSONArray(decline).getJSONObject(0));
+      println("JSON 3 loaded");
       break;
 
     default:
@@ -490,8 +504,18 @@ void runSimulator() {
   ttsExamplePlayback("Go!");
 
   if (recordMode) {
-    
-    writeToFile("\n\nRun #" + Integer.toString(totalSimulatorRuns) + "\n");
+    if (blindMode) {
+      writeToFile("\n\nRun #" + Integer.toString(totalSimulatorRuns) + " (Blind)\n");
+      totalBlindRuns++;
+    } else {
+      writeToFile("\n\nRun #" + Integer.toString(totalSimulatorRuns) + " (Normal)\n");
+      totalNormalRuns++;
+    }
+
+    writeToFile("Blind mode: " + str(blindMode));
+    writeToFile("Game mode: " + str(gameMode));
+    writeToFile("Manual mode: " + str(manualMode) + "\n");
+
     totalSimulatorRuns++;
   }
 
@@ -524,10 +548,14 @@ void update() {
 
       if ((time > 500 && boardXvelocity == 0)) {
         ttsExamplePlayback("Ran out of time!");
-        writeToFile("failed (ran out of time)");
+        if (recordMode) {
+          writeToFile("failed (ran out of time)");
+        }
       } else {
         ttsExamplePlayback("Collision!");
-        writeToFile("failed (collision at time: " + str(time) + ")");
+        if(recordMode) {
+          writeToFile("failed (collision at time: " + str(time) + ")");
+        }
       }
     }
 
@@ -569,7 +597,6 @@ void updateSound() {
     // updating the pitch based on board's Y value
     float pitch = 800 - (boardY);
     skaterPositionGlide.setValue(pitch);
-
 
 
     // using envelope to induce a beeping effect as board gets closer to obstacle
@@ -729,11 +756,23 @@ void draw() {
 
   // ui section and background
   fill(backGood);
+  //stroke(backGood);
   rect(-5, 490, 910, 500);
+
+  if (recordMode) {
+    stroke(backGood);
+    rect(20, 500, 300, 60);
+    fill(color(255,255,255));
+    text("recording! swapping json disabled.", 30, 520);
+    selector.hide();
+  } else {
+    fill(color(255,255,255));
+    text("json demos:", 30, 520);
+    selector.show();
+  }
 
   // text labels
   fill(color(255,255,255));
-  text("json demos:", 30, 520);
   text("modes:", 350, 520);
   text("manual sliders:", 30, 590);
   
@@ -752,6 +791,12 @@ void draw() {
     text("velX: " + str(boardXvelocity), 820, 85 + 575);
   }
 
+  if (back == backWin) {
+    text("success!", SCREEN_WIDTH / 2 - 20, SCREEN_HEIGHT / 2 - 120);
+  }
+  if (back == backFail) {
+    text("failed", SCREEN_WIDTH / 2 - 20, SCREEN_HEIGHT / 2 - 120);
+  }
 
   //rect(0, 490, 900, 1);
 
@@ -759,17 +804,21 @@ void draw() {
 }
 
 void keyPressed() {
-  
-  // select JSON demo
-  if (int(key) > 48 && int(key) < 54) {
-    playbackSelector(int(key) - 49);
-    selector.activate(int(key) - 49);
-  }
 
-  // toggle manual mode
-  if (key == 'm' || key == 'M') {
-    manualModeToggle.setValue(!manualMode);
+  if (!recordMode) {
+    // select JSON demo
+    if (int(key) > 48 && int(key) < 54) {
+      playbackSelector(int(key) - 49);
+      selector.activate(int(key) - 49);
+    }
+
+    // toggle manual mode
+    if (key == 'm' || key == 'M') {
+      manualModeToggle.setValue(!manualMode);
+    }
+
   }
+  
 
   // toggle game mode
   if (key == 'g' || key == 'G') {
@@ -797,7 +846,7 @@ void keyPressed() {
     recordModeToggle.setValue(!recordMode);
   }
 
-  if (gameMode) {
+  if (gameMode && animationRunning) {
 
     // pop
     if (keyCode == 32 && canPop && !spacePressed) { // spacebar
@@ -837,6 +886,13 @@ void keyReleased() {
         writeToFile("X position of pop " + str(boardX));
         writeToFile("X velocity at pop: " + str(boardXvelocity));
         writeToFile("height of pop: " + str(userPopPower));
+
+        println(boardX);
+        println(OBSTACLE_X_INITIAL - currentEvent.getSkaterPopDistanceFromObstacle());
+
+
+        writeToFile("pop position accuracy to JSON: " + str((float)( (boardX)) / (OBSTACLE_X_INITIAL - currentEvent.getSkaterPopDistanceFromObstacle())));
+        writeToFile("height of pop accuracy to JSON: " + str((float) ((userPopPower) / currentEvent.getSkaterPopHeight())));
       }
 
       userPopPower = 0;
@@ -869,7 +925,7 @@ void drawGround(int x, int y, int rotation) {
     translate(x, y);
     rotate(radians(rotation));
       fill(color(90,100,70));
-      stroke(color(90,100,70));
+      stroke(fore);
     rect(-50, 0, 1000, 500);
     popMatrix();
 }

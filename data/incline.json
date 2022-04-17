@@ -1,0 +1,11 @@
+[
+  {
+    "skaterTotalPushes": "4",
+    "skaterPushPower": "4",
+    "skaterPopHeight": "15",
+    "skaterPopDistanceFromObstacle": "140",
+    "obstacleThickness": "25",
+    "obstacleHeight": "20",
+    "groundAngle": "-3"
+  }
+]
