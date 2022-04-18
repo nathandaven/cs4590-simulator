@@ -32,6 +32,7 @@ Slider skaterPopDistanceFromObstacleSlider;
 Slider obstacleThicknessSlider;
 Slider obstacleHeightSlider;
 Slider groundAngleSlider;
+Slider boardAlignmentSlider;
 Slider masterVolumeSlider;
 
 RadioButton selector;
@@ -278,7 +279,18 @@ void createUI() {
     .setColorActive(color(178,235,128))
     .setColorValueLabel(color(90,100,7));
 
+  boardAlignmentSlider = p5.addSlider("boardAlignmentSlider")
+    .setPosition(450, 690)
+    .setSize(200, 20)
+    .setRange(-10, 10)
+    .setValue(2)
+    .setLabel("Skater Initial Alignment")
+    .setColorBackground(color(90,100,70))
+    .setColorForeground(color(148,235,128))
+    .setColorActive(color(178,235,128))
+    .setColorValueLabel(color(90,100,7));
 
+  // hidden due to lack of space
   masterVolumeSlider = p5.addSlider("masterVolumeSlider")
     .setPosition(450, 690)
     .setSize(200, 20)
@@ -288,7 +300,8 @@ void createUI() {
     .setColorBackground(color(90,100,70))
     .setColorForeground(color(148,235,128))
     .setColorActive(color(178,235,128))
-    .setColorValueLabel(color(90,100,7));
+    .setColorValueLabel(color(90,100,7))
+    .hide();
 
 
 }
@@ -323,6 +336,10 @@ void groundAngleSlider(int val) {
   currentEvent.groundAngle = val;
 }
 
+void boardAlignmentSlider(int val) {
+  currentEvent.skaterInitialAlignment = val;
+}
+
 void masterVolumeSlider(float val) {
   masterGainGlide.setValue(val / 100.0);
 }
@@ -335,6 +352,7 @@ void resetSliderValues() {
   obstacleThicknessSlider.setValue(currentEvent.getObstacleThickness());
   obstacleHeightSlider.setValue(currentEvent.getObstacleHeight());
   groundAngleSlider.setValue(currentEvent.getGroundAngle());
+  boardAlignmentSlider.setValue(currentEvent.getSkaterInitialAlignment());
 }
 
 void lockSliderValues() {
@@ -351,6 +369,8 @@ void lockSliderValues() {
   obstacleHeightSlider.lock()
     .setColorForeground(color(200, 210, 200));
   groundAngleSlider.lock()
+    .setColorForeground(color(200, 210, 200));
+  boardAlignmentSlider.lock()
     .setColorForeground(color(200, 210, 200));
 }
 
@@ -369,6 +389,8 @@ void unlockSliderValues() {
   obstacleHeightSlider.unlock()
     .setColorForeground(color(148,235,128));
   groundAngleSlider.unlock()
+    .setColorForeground(color(148,235,128));
+  boardAlignmentSlider.unlock()
     .setColorForeground(color(148,235,128));
 }
 
@@ -448,15 +470,6 @@ void toggleHelp() {
 void playbackSelector(int selection) {
   animationRunning = false;
 
-  if (!manualMode) {
-    surface.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-    size(SCREEN_WIDTH, SCREEN_HEIGHT);
-  } else {
-    resetSliderValues();
-    unlockSliderValues();
-  }
-  
-
   switch(selection){
     case 0: // JSON 1
       currentEvent = new Event(loadJSONArray(flat).getJSONObject(0));
@@ -476,6 +489,14 @@ void playbackSelector(int selection) {
     default:
       println("No selection!");
       break;
+  }
+
+  if (!manualMode) {
+    surface.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+    size(SCREEN_WIDTH, SCREEN_HEIGHT);
+  } else {
+    resetSliderValues();
+    unlockSliderValues();
   }
 }
 
