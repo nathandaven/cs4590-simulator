@@ -49,7 +49,7 @@ class Event {
       output += "skaterPushPower:                 " + getSkaterPushPower() + "\n";
       output += "skaterPopHeight:                 " + getSkaterPopHeight() + "\n";
       output += "skaterPopDistanceFromObstacle:   " + getSkaterPopDistanceFromObstacle() + "\n";
-      output += "skater initial alignment:        " + getSkaterInitialAlignment() + "\n";
+      output += "skaterInitialAlignment:        " + getSkaterInitialAlignment() + "\n";
       output += "obstacleThickness:               " + getObstacleThickness() + "\n";
       output += "obstacleHeight:                  " + getObstacleHeight() + "\n";
       output += "groundAngle:                     " + getGroundAngle() + "\n";
