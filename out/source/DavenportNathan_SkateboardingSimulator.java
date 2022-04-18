@@ -80,6 +80,7 @@ boolean gameMode = false;
 boolean manualMode = false;
 boolean blindMode = false;
 boolean showHelp = true;
+boolean boardIsAlignedRecorded;
 
 
 // constants
@@ -274,7 +275,7 @@ public void createUI() {
   obstacleThicknessSlider = p5.addSlider("obstacleThicknessSlider")
     .setPosition(450, 600)
     .setSize(200, 20)
-    .setRange(10, 40)
+    .setRange(10, 80)
     .setValue(25)
     .setLabel("Obstacle Thickness")
     .setColorBackground(color(90,100,70))
@@ -495,8 +496,6 @@ public void toggleHelp() {
 public void playbackSelector(int selection) {
   animationRunning = false;
 
-  
-
   switch(selection){
     case 0: // JSON 1
       currentEvent = new Event(loadJSONArray(flat).getJSONObject(0));
@@ -549,6 +548,7 @@ public void resetSimulator() {
   boardAlignment = currentEvent.getSkaterInitialAlignment();
   minimap = backFail;
   boardIsAligned = false;
+  boardIsAlignedRecorded = false;
   
 
 }
@@ -770,15 +770,20 @@ public void updateBoard() {
 public void updateMinimap() {
 
 
-  if(boardAlignment >= -2 && boardAlignment <= 2 && !boardIsAligned) {
+
+  if(boardAlignment >= -2 && boardAlignment <= 2) {
     boardIsAligned = true;
     minimap = backGood;
 
-    if (recordMode) {
+    if (recordMode && !boardIsAlignedRecorded) {
       writeToFile("aligned board at: " + str(boardX));
+      boardIsAlignedRecorded = true;
     }
 
-  } 
+  } else {
+    minimap = backFail;
+    boardIsAligned = false;
+  }
 
   // automate alignment for self running examples
   if (!gameMode) {
@@ -850,6 +855,9 @@ public void draw() {
   text("manual sliders:", 30, 590);
   
   if (showHelp) {
+    if (animationRunning) {
+      text("alignment", 900 - 130 + 50 - 30, 145);
+    }
     text("1, 2, 3 to select demo,          r to run simulation,          g for game mode,          m for manual mode,          b for blind mode", 95, 15);
     if(gameMode) {
       text("enter to push,          space to ollie (jump), hold to charge up ollie (jump)          left and right arrow keys to adjust alignment", 95, 480); 
@@ -1037,7 +1045,11 @@ public void drawMinimap() {
     50 + 20 + (boardY + BOARD_HEIGHT - ground) / 6, 
     20, 
     20);
-    popMatrix();
+  
+  fill(color(255,255,255));
+  popMatrix();
+
+
 
 }
 

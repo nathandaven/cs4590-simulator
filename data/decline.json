@@ -1,11 +1,11 @@
 [
   {
     "skaterTotalPushes": "3",
-    "skaterPushPower": "5",
-    "skaterPopHeight": "15",
-    "skaterPopDistanceFromObstacle": "140",
+    "skaterPushPower": "3",
+    "skaterPopHeight": "13",
+    "skaterPopDistanceFromObstacle": "145",
     "skaterInitialAlignment": "-7",
-    "obstacleThickness": "25",
+    "obstacleThickness": "40",
     "obstacleHeight": "20",
     "groundAngle": "5"
   }

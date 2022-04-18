@@ -5,8 +5,8 @@
     "skaterPopHeight": "15",
     "skaterPopDistanceFromObstacle": "140",
     "skaterInitialAlignment": "5",
-    "obstacleThickness": "25",
-    "obstacleHeight": "20",
+    "obstacleThickness": "30",
+    "obstacleHeight": "60",
     "groundAngle": "0"
   }
 ]
