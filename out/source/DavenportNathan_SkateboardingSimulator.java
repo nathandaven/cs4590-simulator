@@ -817,7 +817,7 @@ public void draw() {
   }
 
   if (back == backWin) {
-    text("success", SCREEN_WIDTH / 2 - 20, SCREEN_HEIGHT / 2 - 120);
+    text("success!", SCREEN_WIDTH / 2 - 20, SCREEN_HEIGHT / 2 - 120);
   }
   if (back == backFail) {
     text("failed", SCREEN_WIDTH / 2 - 20, SCREEN_HEIGHT / 2 - 120);
@@ -864,6 +864,10 @@ public void keyPressed() {
   // run simulator
   if (key == 'r' || key == 'R') {
     runSimulator();
+  }
+
+  if (keyCode == 27) {
+    exit();
   }
 
   // recordMode
@@ -1013,6 +1017,15 @@ public boolean collisionWithObstacle() {
         && colA < colB + widthB && colA + widthA > colB;
 
   
+}
+
+// overloading exit to make sure the writer closes if recording
+public void exit() {
+  println("stopping program...");
+  if (recordMode) {
+    closeFile();
+  }
+  super.exit();
 }
 class Event {
   

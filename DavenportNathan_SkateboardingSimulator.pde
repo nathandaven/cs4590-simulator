@@ -806,7 +806,7 @@ void draw() {
 void keyPressed() {
 
   if (!recordMode) {
-    // select JSON demo
+    // select JSON demo with 1-3 number keys
     if (int(key) > 48 && int(key) < 54) {
       playbackSelector(int(key) - 49);
       selector.activate(int(key) - 49);
@@ -831,8 +831,8 @@ void keyPressed() {
 
   }
 
-  // reset 
-  if (keyCode == 8) { // backspace key
+  // reset with BACKSPACE key
+  if (keyCode == 8) {
     resetSimulator();
   }
 
@@ -841,20 +841,25 @@ void keyPressed() {
     runSimulator();
   }
 
-  // recordMode
+  // close program with ESCAPE key
+  if (keyCode == 27) {
+    exit();
+  }
+
+  // recordMode using TAB key
   if (keyCode == 9) {
     recordModeToggle.setValue(!recordMode);
   }
 
   if (gameMode && animationRunning) {
 
-    // pop
+    // pop with SPACE key
     if (keyCode == 32 && canPop && !spacePressed) { // spacebar
       spacePressed = true;
       canPop = false;
     } 
 
-    // push
+    // push with ENTER key
     if (key == RETURN || key == ENTER && pushTimer < time && /* totalPushes > 0 && */ canPush && canPop) {
       boardXvelocity += currentEvent.getSkaterPushPower();
       pushTimer = time + PUSH_TIMING;
@@ -876,6 +881,7 @@ void keyPressed() {
 void keyReleased() {
   if (gameMode) {
 
+    // SPACE key pop
     if (keyCode == 32 && canPop) {
       spacePressed = false;
       boardYvelocity = userPopPower;
@@ -904,6 +910,7 @@ void keyReleased() {
 
     }
 
+    // ENTER key push
     if (key == RETURN || key == ENTER) {
       canPush = true;
     }
@@ -988,4 +995,13 @@ boolean collisionWithObstacle() {
         && colA < colB + widthB && colA + widthA > colB;
 
   
+}
+
+// overloading exit to make sure the writer closes if recording
+void exit() {
+  println("stopping program...");
+  if (recordMode) {
+    closeFile();
+  }
+  super.exit();
 }
