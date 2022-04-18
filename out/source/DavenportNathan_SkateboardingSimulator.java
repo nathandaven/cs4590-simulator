@@ -50,8 +50,6 @@ int fore     = color(148, 235, 128);
 int back     = backGood;
 
 // Sliders
-Slider[] sliders;
-
 Slider skaterTotalPushesSlider;
 Slider skaterPushPowerSlider;
 Slider skaterPopHeightSlider;
@@ -74,13 +72,13 @@ Button helpButton;
 // animation
 int time;
 boolean animationRunning;
-int ground = 300;
+int ground = 380;
 
 boolean recordMode;
 boolean gameMode = false;
 boolean manualMode = false;
 boolean blindMode = false;
-boolean showHelp = false;
+boolean showHelp = true;
 
 
 // constants
@@ -97,6 +95,7 @@ int OBSTACLE_X_INITIAL = 600;
 int OBSTACLE_Y_INITIAL = ground;
 int PUSH_TIMING = 20;
 int TOTAL_PUSHES = 3;
+int MINIMAP_BOARD_SIZE = 20;
 
 // board variables
 int boardX;
@@ -112,11 +111,16 @@ boolean voicePlayed;
 boolean hasPopped;
 boolean playedLandSound;
 boolean boardHasCleared;
+boolean boardIsAligned;
+
+int boardAlignment;
+int minimap;
 
 // input
 boolean spacePressed;
 int userPopPower;
 int pushTimer;
+String failedText;
 
 // i moved a lot of setup into their own methods and files for organization
 public void setup() {
@@ -519,6 +523,11 @@ public void resetSimulator() {
   hasPopped = false;
   boardHasCleared = false;
 
+  boardAlignment = currentEvent.getSkaterInitialAlignment();
+  minimap = backFail;
+  boardIsAligned = false;
+  
+
 }
 
 public void runSimulator() {
@@ -564,6 +573,9 @@ public void update() {
     // update board data
     updateBoard();
 
+    // updating minimap
+    updateMinimap();
+
 
     // collision with obstacle
     if (collisionWithObstacle() || (time > 500 && boardXvelocity == 0)) {
@@ -573,11 +585,13 @@ public void update() {
 
       if ((time > 500 && boardXvelocity == 0)) {
         ttsExamplePlayback("Ran out of time!");
+        failedText = "ran out of time";
         if (recordMode) {
           writeToFile("failed (ran out of time)");
         }
       } else {
         ttsExamplePlayback("Collision!");
+        failedText = "collision";
         if(recordMode) {
           writeToFile("failed (collision at time: " + str(time) + ")");
         }
@@ -597,14 +611,23 @@ public void update() {
   if (boardX > OBSTACLE_X_INITIAL + currentEvent.getObstacleThickness() && animationRunning) {
     boardHasCleared = true;
   }
+  
 
-  if (boardHasCleared && animationRunning && boardX > SCREEN_WIDTH) {
+  if (boardHasCleared && animationRunning && boardX > SCREEN_WIDTH && boardIsAligned) {
     ttsExamplePlayback("Success!");
     if (recordMode) {
       totalSuccessfulRuns++;
       writeToFile("time of success: " + str(time));
     }
     back = backWin;
+  } else if (boardHasCleared && animationRunning && boardX > SCREEN_WIDTH && !boardIsAligned) {
+    ttsExamplePlayback("Board not aligned");
+    failedText = "board not aligned";
+    back = backFail;
+    
+    if (recordMode) {
+      writeToFile("failed (board not aligned)");
+    }
   }
 
   // ending animation if board goes off screen
@@ -641,6 +664,9 @@ public void updateSound() {
 
     // updates gain
     skaterPositionGain.setGain(envelope);
+
+    // updating panning based on minimap position
+    pannerGlide.setValue((float) boardAlignment / 10);
 
   } else { // when animation successful
     envelope.clear();
@@ -705,19 +731,9 @@ public void updateBoard() {
   //!! x direction
   boardX += boardXvelocity;
 
-  //boardXvelocity -= boardXacceleration;
   // applying angle to drag frequency to make the angle *feel* more difficult to push up, or easier to go down depending on angle
   if (time % (55 + (currentEvent.getGroundAngle() * 10)) == 0) {
       boardXvelocity -= BOARD_X_DRAG;
-
-    /*
-    if (currentEvent.getGroundAngle() > 0) {
-      // makes board accelerate faster downhill
-      boardXvelocity += BOARD_X_DRAG;
-    } else {
-      boardXvelocity -= BOARD_X_DRAG;
-      // makes board drag uphill
-    } */
 
   }
   if (boardXvelocity < 0) {
@@ -728,11 +744,37 @@ public void updateBoard() {
   }
 }
 
+public void updateMinimap() {
+
+
+  if(boardAlignment >= -2 && boardAlignment <= 2 && !boardIsAligned) {
+    boardIsAligned = true;
+    minimap = backGood;
+
+    if (recordMode) {
+      writeToFile("aligned board at: " + str(boardX));
+    }
+
+  } 
+
+  // automate alignment for self running examples
+  if (!gameMode) {
+    if (time % 10 == 0 && !boardIsAligned && canPush) {
+      if (boardAlignment > 0) {
+        boardAlignment -= 1;
+      } else {
+        boardAlignment += 1;
+      }
+    }
+  }
+
+
+}
+
 public void draw() {
   update();
 
   // ui
-
 
   // !! DRAW SECTION
   if (blindMode) {
@@ -752,29 +794,11 @@ public void draw() {
     
     // Animation drawing
     if(animationRunning) {
-
-      int boardRoation = -2*boardYvelocity;
-      if (boardRoation > 0) {
-        boardRoation = 0;
-      }
-
       // UI setup 
       background(back);
       
-
-      fill(color(90,100,70));
-      stroke(color(90,100,70));
-      drawGround(0, ground, currentEvent.getGroundAngle());
-
-      fill(fore);
-      stroke(fore);
-      drawBoard(boardX, boardY, boardRoation);
-      drawObstacle(
-        OBSTACLE_X_INITIAL, 
-        OBSTACLE_Y_INITIAL - currentEvent.getObstacleHeight(), 
-        currentEvent.getObstacleThickness(), 
-        currentEvent.getObstacleHeight()
-      );
+      drawSideView();
+      drawMinimap();
     }
 
   }
@@ -796,15 +820,16 @@ public void draw() {
     selector.show();
   }
 
+
   // text labels
   fill(color(255,255,255));
   text("modes:", 350, 520);
   text("manual sliders:", 30, 590);
   
   if (showHelp) {
-    text("1, 2, 3 to select demo,          r to run simulation,          g for game mode,          m for manual mode,          b for blind mode", 100, 15);
+    text("1, 2, 3 to select demo,          r to run simulation,          g for game mode,          m for manual mode,          b for blind mode", 95, 15);
     if(gameMode) {
-      text("enter to push,          space to ollie (jump), hold to charge up ollie (jump)", 240, 480); 
+      text("enter to push,          space to ollie (jump), hold to charge up ollie (jump)          left and right arrow keys to adjust alignment", 95, 480); 
     }
 
     // debug text
@@ -814,14 +839,17 @@ public void draw() {
     text("posY: " + str(boardY), 820, 65 + 575);
     text("posX: " + str(boardX), 820, 75 + 575);
     text("velX: " + str(boardXvelocity), 820, 85 + 575);
+    text("alignment: " + str(boardAlignment), 820, 95 + 575);
   }
 
   if (back == backWin) {
     text("success!", SCREEN_WIDTH / 2 - 20, SCREEN_HEIGHT / 2 - 120);
   }
   if (back == backFail) {
-    text("failed", SCREEN_WIDTH / 2 - 20, SCREEN_HEIGHT / 2 - 120);
+    text(failedText, SCREEN_WIDTH / 2 - 30, SCREEN_HEIGHT / 2 - 50);
   }
+
+
 
   //rect(0, 490, 900, 1);
 
@@ -830,8 +858,9 @@ public void draw() {
 
 public void keyPressed() {
 
+
   if (!recordMode) {
-    // select JSON demo
+    // select JSON demo with 1-3 number keys
     if (PApplet.parseInt(key) > 48 && PApplet.parseInt(key) < 54) {
       playbackSelector(PApplet.parseInt(key) - 49);
       selector.activate(PApplet.parseInt(key) - 49);
@@ -856,8 +885,8 @@ public void keyPressed() {
 
   }
 
-  // reset 
-  if (keyCode == 8) { // backspace key
+  // reset with BACKSPACE key
+  if (keyCode == 8) {
     resetSimulator();
   }
 
@@ -866,24 +895,39 @@ public void keyPressed() {
     runSimulator();
   }
 
+  // close program with ESCAPE key
   if (keyCode == 27) {
     exit();
   }
 
-  // recordMode
+  // recordMode using TAB key
   if (keyCode == 9) {
     recordModeToggle.setValue(!recordMode);
   }
 
   if (gameMode && animationRunning) {
 
-    // pop
+    // left arrow key
+    if (keyCode == 37) {
+      if (((float) boardAlignment / 10) > -0.9f) {
+        boardAlignment -= 1;
+      }
+    }
+
+    // right arrow keyx
+    if (keyCode == 39) {
+      if (((float) boardAlignment / 10) < 0.9f) {
+        boardAlignment += 1;
+      }
+    }
+
+    // pop with SPACE key
     if (keyCode == 32 && canPop && !spacePressed) { // spacebar
       spacePressed = true;
       canPop = false;
     } 
 
-    // push
+    // push with ENTER key
     if (key == RETURN || key == ENTER && pushTimer < time && /* totalPushes > 0 && */ canPush && canPop) {
       boardXvelocity += currentEvent.getSkaterPushPower();
       pushTimer = time + PUSH_TIMING;
@@ -902,9 +946,11 @@ public void keyPressed() {
 
 }
 
+
 public void keyReleased() {
   if (gameMode) {
 
+    // SPACE key pop
     if (keyCode == 32 && canPop) {
       spacePressed = false;
       boardYvelocity = userPopPower;
@@ -933,10 +979,68 @@ public void keyReleased() {
 
     }
 
+    // ENTER key push
     if (key == RETURN || key == ENTER) {
       canPush = true;
     }
   }
+}
+
+
+public void drawMinimap() {
+
+  fill(minimap);
+  stroke(fore);
+  //rect(30, 30, 900 - 60, 100);
+  pushMatrix();
+  translate(0, 0);
+  // minimap
+  rect(900 - 130, 30, 100, 100);
+
+  // center
+  //stroke(backFail);
+  fill(back);
+  rect(
+    900 - 130 + 50 - 20 /* currentEvent.getObstacleThickness()/2 */, 
+    50 + 20 /* currentEvent.getObstacleHeight() */ , 
+    40 /* currentEvent.getObstacleThickness() */, 
+    20 /* currentEvent.getObstacleHeight() */);
+  
+  // board
+  fill(fore);
+  stroke(fore);
+  rect(
+    900 - 130 + 50 - 10 + (((float) boardAlignment / 10) * 40), 
+    50 + 20 + (boardY + BOARD_HEIGHT - ground) / 6, 
+    20, 
+    20);
+    popMatrix();
+
+}
+
+
+public void drawSideView() {
+
+      int boardAngle = -2*boardYvelocity;
+      if (boardAngle > 0) {
+        boardAngle = 0;
+      }
+
+
+      fill(color(90,100,70));
+      stroke(color(90,100,70));
+      drawGround(0, ground, currentEvent.getGroundAngle());
+
+      fill(fore);
+      stroke(fore);
+      drawBoard(boardX, boardY, boardAngle);
+      drawObstacle(
+        OBSTACLE_X_INITIAL, 
+        OBSTACLE_Y_INITIAL - currentEvent.getObstacleHeight(), 
+        currentEvent.getObstacleThickness(), 
+        currentEvent.getObstacleHeight()
+      );
+
 }
 
 public void drawObstacle(int x, int y, int thickness, int height) {
@@ -1001,6 +1105,28 @@ public void drawBoard(int x, int y, int rotation) {
   popMatrix();
 }
 
+public void drawBoardTop(int x, int y, int rotation) {
+  pushMatrix();
+  // hitbox rect(x, y, BOARD_WIDTH, BOARD_HEIGHT);
+  translate(x, y);
+  rotate(radians(rotation));
+      fill(fore);
+      stroke(fore);
+  circle(BOARD_HEIGHT / 2, BOARD_HEIGHT / 2, BOARD_HEIGHT);
+  rect(BOARD_HEIGHT / 2, 0, BOARD_WIDTH - BOARD_HEIGHT, BOARD_HEIGHT);
+  circle(BOARD_WIDTH - BOARD_HEIGHT / 2, BOARD_HEIGHT / 2, BOARD_HEIGHT);
+  popMatrix();
+}
+
+public void drawObstacleTop(int x, int y, int thickness, int rotation) {
+    // draws ground
+    pushMatrix();
+    translate(x, y);
+    rotate(radians(rotation));
+    rect(0, 0, thickness, 100);
+    popMatrix();
+
+}
 
 public boolean collisionWithObstacle() {
 
@@ -1033,6 +1159,7 @@ class Event {
   int skaterPushPower;
   int skaterPopHeight;
   int skaterPopDistanceFromObstacle;
+  int skaterInitialAlignment;
   int obstacleThickness;
   int obstacleHeight;
   int groundAngle;
@@ -1045,6 +1172,7 @@ class Event {
     this.skaterPushPower   = json.getInt("skaterPushPower");
     this.skaterPopHeight   = json.getInt("skaterPopHeight");
     this.skaterPopDistanceFromObstacle   = json.getInt("skaterPopDistanceFromObstacle");
+    this.skaterInitialAlignment          = json.getInt("skaterInitialAlignment");
     this.obstacleThickness = json.getInt("obstacleThickness");
     this.obstacleHeight    = json.getInt("obstacleHeight");
     this.groundAngle       = json.getInt("groundAngle");
@@ -1062,6 +1190,7 @@ class Event {
   public int getSkaterPushPower()   { return skaterPushPower; }
   public int getSkaterPopHeight()   { return skaterPopHeight; }
   public int getSkaterPopDistanceFromObstacle()   { return skaterPopDistanceFromObstacle; }
+  public int getSkaterInitialAlignment()          { return skaterInitialAlignment; }
   public int getObstacleThickness() { return obstacleThickness; }
   public int getObstacleHeight()    { return obstacleHeight; }
   public int getGroundAngle()       { return groundAngle; }
@@ -1075,6 +1204,7 @@ class Event {
       output += "skaterPushPower:                 " + getSkaterPushPower() + "\n";
       output += "skaterPopHeight:                 " + getSkaterPopHeight() + "\n";
       output += "skaterPopDistanceFromObstacle:   " + getSkaterPopDistanceFromObstacle() + "\n";
+      output += "skater initial alignment:        " + getSkaterInitialAlignment() + "\n";
       output += "obstacleThickness:               " + getObstacleThickness() + "\n";
       output += "obstacleHeight:                  " + getObstacleHeight() + "\n";
       output += "groundAngle:                     " + getGroundAngle() + "\n";
@@ -1183,6 +1313,10 @@ Glide highpassGlide;
 // envelopes
 Envelope envelope;
 
+// panner
+Panner panner;
+Glide pannerGlide;
+
 public void setupAudio() {
   setupMasterGain();
   setupUgens();
@@ -1192,7 +1326,7 @@ public void setupAudio() {
 
 public void setupMasterGain() {
   masterGainGlide = new Glide(ac, 1.0f, 1.0f);  
-  masterGain = new Gain(ac, 1, masterGainGlide);
+  masterGain = new Gain(ac, 2, masterGainGlide);
   ac.out.addInput(masterGain);
 }
 
@@ -1209,6 +1343,11 @@ public void setupUgens() {
 
   // envelopes
   envelope = new Envelope(ac);
+
+
+  // panner
+  pannerGlide = new Glide(ac, 0, 5);
+  panner = new Panner(ac, pannerGlide);
 
 
 }
@@ -1229,7 +1368,7 @@ public void setupSamplePlayers() {
   pop.pause(true);
   push.pause(true);
 
-  spGain = new Gain(ac, 1, 0.3f); // create the gain object
+  spGain = new Gain(ac, 2, 0.3f); // create the gain object
 
   // add sounds
   spGain.addInput(land);
@@ -1267,24 +1406,21 @@ public void resetBaseFrequency() {
 
   // create gain
   skaterPositionGainGlide = new Glide(ac, 0, 0);
-  skaterPositionGain = new Gain(ac, 1, 0.0f /* skaterPositionGainGlide */); // create the gain object
+  skaterPositionGain = new Gain(ac, 2, 0.0f /* skaterPositionGainGlide */); // create the gain object
 
 
 
 
   skaterPositionGain.addInput(skaterPositionTone);
-  masterGain.addInput(skaterPositionGain);
-
-
-
-
+  panner.addInput(skaterPositionGain);
+  masterGain.addInput(panner);
 
 }
 
 public void ttsExamplePlayback(String inputSpeech) {
   
 
-  ttsGain = new Gain(ac, 1, 1.0f);
+  ttsGain = new Gain(ac, 2, 1.0f);
 
   //create TTS file and play it back immediately
   //the SamplePlayer will remove itself when it is finished in this case

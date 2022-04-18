@@ -36,6 +36,10 @@ Glide highpassGlide;
 // envelopes
 Envelope envelope;
 
+// panner
+Panner panner;
+Glide pannerGlide;
+
 void setupAudio() {
   setupMasterGain();
   setupUgens();
@@ -45,7 +49,7 @@ void setupAudio() {
 
 void setupMasterGain() {
   masterGainGlide = new Glide(ac, 1.0, 1.0);  
-  masterGain = new Gain(ac, 1, masterGainGlide);
+  masterGain = new Gain(ac, 2, masterGainGlide);
   ac.out.addInput(masterGain);
 }
 
@@ -62,6 +66,11 @@ void setupUgens() {
 
   // envelopes
   envelope = new Envelope(ac);
+
+
+  // panner
+  pannerGlide = new Glide(ac, 0, 5);
+  panner = new Panner(ac, pannerGlide);
 
 
 }
@@ -82,7 +91,7 @@ void setupSamplePlayers() {
   pop.pause(true);
   push.pause(true);
 
-  spGain = new Gain(ac, 1, 0.3); // create the gain object
+  spGain = new Gain(ac, 2, 0.3); // create the gain object
 
   // add sounds
   spGain.addInput(land);
@@ -120,24 +129,21 @@ void resetBaseFrequency() {
 
   // create gain
   skaterPositionGainGlide = new Glide(ac, 0, 0);
-  skaterPositionGain = new Gain(ac, 1, 0.0 /* skaterPositionGainGlide */); // create the gain object
+  skaterPositionGain = new Gain(ac, 2, 0.0 /* skaterPositionGainGlide */); // create the gain object
 
 
 
 
   skaterPositionGain.addInput(skaterPositionTone);
-  masterGain.addInput(skaterPositionGain);
-
-
-
-
+  panner.addInput(skaterPositionGain);
+  masterGain.addInput(panner);
 
 }
 
 void ttsExamplePlayback(String inputSpeech) {
   
 
-  ttsGain = new Gain(ac, 1, 1.0);
+  ttsGain = new Gain(ac, 2, 1.0);
 
   //create TTS file and play it back immediately
   //the SamplePlayer will remove itself when it is finished in this case

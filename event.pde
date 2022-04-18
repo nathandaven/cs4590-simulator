@@ -4,6 +4,7 @@ class Event {
   int skaterPushPower;
   int skaterPopHeight;
   int skaterPopDistanceFromObstacle;
+  int skaterInitialAlignment;
   int obstacleThickness;
   int obstacleHeight;
   int groundAngle;
@@ -16,6 +17,7 @@ class Event {
     this.skaterPushPower   = json.getInt("skaterPushPower");
     this.skaterPopHeight   = json.getInt("skaterPopHeight");
     this.skaterPopDistanceFromObstacle   = json.getInt("skaterPopDistanceFromObstacle");
+    this.skaterInitialAlignment          = json.getInt("skaterInitialAlignment");
     this.obstacleThickness = json.getInt("obstacleThickness");
     this.obstacleHeight    = json.getInt("obstacleHeight");
     this.groundAngle       = json.getInt("groundAngle");
@@ -33,6 +35,7 @@ class Event {
   public int getSkaterPushPower()   { return skaterPushPower; }
   public int getSkaterPopHeight()   { return skaterPopHeight; }
   public int getSkaterPopDistanceFromObstacle()   { return skaterPopDistanceFromObstacle; }
+  public int getSkaterInitialAlignment()          { return skaterInitialAlignment; }
   public int getObstacleThickness() { return obstacleThickness; }
   public int getObstacleHeight()    { return obstacleHeight; }
   public int getGroundAngle()       { return groundAngle; }
@@ -46,6 +49,7 @@ class Event {
       output += "skaterPushPower:                 " + getSkaterPushPower() + "\n";
       output += "skaterPopHeight:                 " + getSkaterPopHeight() + "\n";
       output += "skaterPopDistanceFromObstacle:   " + getSkaterPopDistanceFromObstacle() + "\n";
+      output += "skater initial alignment:        " + getSkaterInitialAlignment() + "\n";
       output += "obstacleThickness:               " + getObstacleThickness() + "\n";
       output += "obstacleHeight:                  " + getObstacleHeight() + "\n";
       output += "groundAngle:                     " + getGroundAngle() + "\n";

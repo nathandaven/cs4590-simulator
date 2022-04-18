@@ -4,6 +4,7 @@
     "skaterPushPower": "3",
     "skaterPopHeight": "15",
     "skaterPopDistanceFromObstacle": "140",
+    "skaterInitialAlignment": "5",
     "obstacleThickness": "25",
     "obstacleHeight": "20",
     "groundAngle": "0"
