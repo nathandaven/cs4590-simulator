@@ -1,1 +1,1 @@
-![PDF Document](readme.pdf)
+[Research Document](readme.pdf)
