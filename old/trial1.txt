@@ -1,0 +1,288 @@
+Current Event: 
+
+skaterTotalPushes:               3
+skaterPushPower:                 3
+skaterPopHeight:                 15
+skaterPopDistanceFromObstacle:   140
+skaterInitialAlignment:        5
+obstacleThickness:               30
+obstacleHeight:                  60
+groundAngle:                     0
+comment:                         ~
+
+
+
+Run #0 (Normal)
+
+Blind mode: false
+Game mode: true
+Manual mode: false
+
+pushed at: 0
+pushed at: 78
+pushed at: 210
+X position of pop 479
+X velocity at pop: 7
+height of pop: 15
+pop position accuracy to JSON: 1.0413043
+height of pop accuracy to JSON: 1.0
+failed (board not aligned)
+
+
+Run #1 (Normal)
+
+Blind mode: false
+Game mode: true
+Manual mode: false
+
+pushed at: 0
+pushed at: 120
+pushed at: 235
+failed (collision at time: 102)
+
+
+Run #2 (Normal)
+
+Blind mode: false
+Game mode: true
+Manual mode: false
+
+pushed at: 0
+pushed at: 123
+X position of pop 299
+X velocity at pop: 5
+height of pop: 15
+pop position accuracy to JSON: 0.65
+height of pop accuracy to JSON: 1.0
+pushed at: 514
+failed (collision at time: 131)
+
+
+Run #3 (Normal)
+
+Blind mode: false
+Game mode: true
+Manual mode: false
+
+pushed at: 0
+pushed at: 129
+
+
+Run #4 (Normal)
+
+Blind mode: false
+Game mode: true
+Manual mode: false
+
+X position of pop 0
+X velocity at pop: 0
+height of pop: 3
+pop position accuracy to JSON: 0.0
+height of pop accuracy to JSON: 0.0
+pushed at: 0
+pushed at: 57
+pushed at: 172
+X position of pop 394
+X velocity at pop: 7
+height of pop: 10
+pop position accuracy to JSON: 0.8565217
+height of pop accuracy to JSON: 0.0
+failed (collision at time: 131)
+
+
+Run #5 (Normal)
+
+Blind mode: false
+Game mode: true
+Manual mode: false
+
+pushed at: 0
+pushed at: 69
+pushed at: 295
+X position of pop 519
+X velocity at pop: 8
+height of pop: 15
+pop position accuracy to JSON: 1.1282609
+height of pop accuracy to JSON: 1.0
+failed (collision at time: 98)
+
+
+Run #6 (Normal)
+
+Blind mode: false
+Game mode: true
+Manual mode: false
+
+pushed at: 0
+pushed at: 123
+X position of pop 488
+X velocity at pop: 4
+height of pop: 15
+pop position accuracy to JSON: 1.0608696
+height of pop accuracy to JSON: 1.0
+failed (collision at time: 146)
+
+
+Run #7 (Normal)
+
+Blind mode: false
+Game mode: true
+Manual mode: false
+
+pushed at: 0
+pushed at: 105
+pushed at: 296
+X position of pop 504
+X velocity at pop: 8
+height of pop: 15
+pop position accuracy to JSON: 1.0956522
+height of pop accuracy to JSON: 1.0
+failed (collision at time: 109)
+
+
+Run #8 (Normal)
+
+Blind mode: false
+Game mode: true
+Manual mode: false
+
+pushed at: 0
+pushed at: 84
+pushed at: 207
+X position of pop 479
+X velocity at pop: 8
+height of pop: 15
+pop position accuracy to JSON: 1.0413043
+height of pop accuracy to JSON: 1.0
+failed (board not aligned)
+
+
+Run #9 (Normal)
+
+Blind mode: false
+Game mode: true
+Manual mode: false
+
+pushed at: 0
+pushed at: 90
+aligned board at: 180
+pushed at: 299
+X position of pop 315
+X velocity at pop: 8
+height of pop: 10
+pop position accuracy to JSON: 0.6847826
+height of pop accuracy to JSON: 0.0
+X position of pop 507
+X velocity at pop: 8
+height of pop: 0
+pop position accuracy to JSON: 1.1021739
+height of pop accuracy to JSON: 0.0
+failed (collision at time: 102)
+
+
+Run #10 (Normal)
+
+Blind mode: false
+Game mode: true
+Manual mode: false
+
+pushed at: 0
+pushed at: 84
+pushed at: 240
+pushed at: 464
+X position of pop 497
+X velocity at pop: 11
+height of pop: 7
+pop position accuracy to JSON: 1.0804348
+height of pop accuracy to JSON: 0.0
+failed (collision at time: 101)
+
+
+Run #11 (Normal)
+
+Blind mode: false
+Game mode: true
+Manual mode: false
+
+pushed at: 0
+pushed at: 75
+pushed at: 219
+aligned board at: 228
+pushed at: 396
+failed (collision at time: 88)
+X position of pop 528
+X velocity at pop: 11
+height of pop: 9
+pop position accuracy to JSON: 1.1478261
+height of pop accuracy to JSON: 0.0
+
+
+Run #12 (Normal)
+
+Blind mode: false
+Game mode: true
+Manual mode: false
+
+pushed at: 0
+pushed at: 66
+pushed at: 210
+aligned board at: 219
+X position of pop 479
+X velocity at pop: 8
+height of pop: 12
+pop position accuracy to JSON: 1.0413043
+height of pop accuracy to JSON: 0.0
+failed (collision at time: 89)
+
+
+Run #13 (Normal)
+
+Blind mode: false
+Game mode: true
+Manual mode: false
+
+pushed at: 0
+pushed at: 84
+aligned board at: 90
+pushed at: 233
+X position of pop 489
+X velocity at pop: 8
+height of pop: 10
+pop position accuracy to JSON: 1.0630435
+height of pop accuracy to JSON: 0.0
+failed (collision at time: 98)
+
+
+Run #14 (Normal)
+
+Blind mode: false
+Game mode: true
+Manual mode: false
+
+pushed at: 0
+pushed at: 63
+aligned board at: 69
+pushed at: 231
+X position of pop 463
+X velocity at pop: 8
+height of pop: 15
+pop position accuracy to JSON: 1.0065217
+height of pop accuracy to JSON: 1.0
+time of success: 150
+
+
+Run #15 (Normal)
+
+Blind mode: false
+Game mode: true
+Manual mode: false
+
+
+
+
+Total Runs: 16
+Success rate (overall): 0.0625
+Success rate (Normal: 0.0625
+Success rate (Blind): NaN
+
+End of file

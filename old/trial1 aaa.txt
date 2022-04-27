@@ -1,0 +1,21 @@
+Current Event: 
+
+skaterTotalPushes:               3
+skaterPushPower:                 3
+skaterPopHeight:                 15
+skaterPopDistanceFromObstacle:   140
+skaterInitialAlignment:        5
+obstacleThickness:               30
+obstacleHeight:                  60
+groundAngle:                     0
+comment:                         ~
+
+
+
+
+Total Runs: 0
+Success rate (overall): NaN
+Success rate (Normal): NaN
+Success rate (Blind): NaN
+
+End of file

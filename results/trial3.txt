@@ -1,0 +1,114 @@
+Current Event: 
+
+skaterTotalPushes:               3
+skaterPushPower:                 3
+skaterPopHeight:                 13
+skaterPopDistanceFromObstacle:   145
+skaterInitialAlignment:        -7
+obstacleThickness:               40
+obstacleHeight:                  20
+groundAngle:                     5
+comment:                         ~
+
+
+
+Run #0 (Blind)
+
+Blind mode: true
+Game mode: true
+Manual mode: false
+
+pushed at: 0
+pushed at: 63
+pushed at: 195
+failed (collision at time: 136)
+
+
+Run #1 (Normal)
+
+Blind mode: false
+Game mode: true
+Manual mode: false
+
+pushed at: 0
+pushed at: 66
+pushed at: 198
+X position of pop 450
+X velocity at pop: 9
+height of pop: 13
+pop position accuracy to JSON: 0.989011
+height of pop accuracy to JSON: 1.0
+failed (board not aligned)
+
+
+Run #2 (Normal)
+
+Blind mode: false
+Game mode: true
+Manual mode: false
+
+pushed at: 0
+pushed at: 66
+pushed at: 216
+X position of pop 468
+X velocity at pop: 9
+height of pop: 9
+pop position accuracy to JSON: 1.0285715
+height of pop accuracy to JSON: 0.0
+failed (collision at time: 97)
+
+
+Run #3 (Normal)
+
+Blind mode: false
+Game mode: true
+Manual mode: false
+
+pushed at: 0
+pushed at: 63
+aligned board at: 405
+failed (collision at time: 105)
+X position of pop 525
+X velocity at pop: 5
+height of pop: 13
+pop position accuracy to JSON: 1.1538461
+height of pop accuracy to JSON: 1.0
+
+
+Run #4 (Normal)
+
+Blind mode: false
+Game mode: true
+Manual mode: false
+
+
+
+Run #5 (Normal)
+
+Blind mode: false
+Game mode: true
+Manual mode: false
+
+
+
+Run #6 (Normal)
+
+Blind mode: false
+Game mode: true
+Manual mode: false
+
+
+
+
+Total Runs (overall): 7
+Total runs (normal): 6
+Total runs (blind): 1
+Success rate (overall): 0.0
+Success rate (Normal): 0.0
+Success rate (Blind): 0.0
+Total time spent (Normal): 338.0
+Total time spent (Blind): 136.0
+Avg time spent (Normal): 56.0
+Avg time spent (Blind): 136.0
+
+End of file

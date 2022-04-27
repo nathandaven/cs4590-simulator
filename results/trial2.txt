@@ -1,0 +1,234 @@
+Current Event: 
+
+skaterTotalPushes:               3
+skaterPushPower:                 3
+skaterPopHeight:                 13
+skaterPopDistanceFromObstacle:   145
+skaterInitialAlignment:        -7
+obstacleThickness:               40
+obstacleHeight:                  20
+groundAngle:                     5
+comment:                         ~
+
+
+
+Run #0 (Blind)
+
+Blind mode: true
+Game mode: true
+Manual mode: false
+
+pushed at: 0
+pushed at: 78
+pushed at: 191
+pushed at: 359
+X position of pop 502
+X velocity at pop: 11
+height of pop: 10
+pop position accuracy to JSON: 1.1032968
+height of pop accuracy to JSON: 0.0
+failed (collision at time: 160)
+
+
+Run #1 (Normal)
+
+Blind mode: false
+Game mode: true
+Manual mode: false
+
+pushed at: 0
+pushed at: 81
+pushed at: 243
+X position of pop 450
+X velocity at pop: 9
+height of pop: 11
+pop position accuracy to JSON: 0.989011
+height of pop accuracy to JSON: 0.0
+failed (board not aligned)
+
+
+Run #2 (Normal)
+
+Blind mode: false
+Game mode: true
+Manual mode: false
+
+pushed at: 0
+pushed at: 102
+pushed at: 234
+X position of pop 477
+X velocity at pop: 9
+height of pop: 8
+pop position accuracy to JSON: 1.0483516
+height of pop accuracy to JSON: 0.0
+failed (collision at time: 105)
+
+
+Run #3 (Normal)
+
+Blind mode: false
+Game mode: true
+Manual mode: false
+
+pushed at: 0
+pushed at: 75
+pushed at: 213
+X position of pop 438
+X velocity at pop: 9
+height of pop: 11
+pop position accuracy to JSON: 0.96263736
+height of pop accuracy to JSON: 0.0
+failed (collision at time: 111)
+
+
+Run #4 (Normal)
+
+Blind mode: false
+Game mode: true
+Manual mode: false
+
+pushed at: 0
+pushed at: 63
+pushed at: 189
+pushed at: 387
+X position of pop 519
+X velocity at pop: 12
+height of pop: 9
+pop position accuracy to JSON: 1.1406593
+height of pop accuracy to JSON: 0.0
+failed (collision at time: 83)
+
+
+Run #5 (Normal)
+
+Blind mode: false
+Game mode: true
+Manual mode: false
+
+pushed at: 0
+pushed at: 63
+pushed at: 225
+X position of pop 405
+X velocity at pop: 9
+height of pop: 13
+pop position accuracy to JSON: 0.8901099
+height of pop accuracy to JSON: 1.0
+failed (collision at time: 99)
+
+
+Run #6 (Normal)
+
+Blind mode: false
+Game mode: true
+Manual mode: false
+
+pushed at: 0
+pushed at: 84
+pushed at: 234
+X position of pop 477
+X velocity at pop: 9
+height of pop: 13
+pop position accuracy to JSON: 1.0483516
+height of pop accuracy to JSON: 1.0
+failed (board not aligned)
+
+
+Run #7 (Normal)
+
+Blind mode: false
+Game mode: true
+Manual mode: false
+
+pushed at: 0
+pushed at: 72
+pushed at: 216
+pushed at: 414
+aligned board at: 462
+failed (collision at time: 90)
+X position of pop 522
+X velocity at pop: 12
+height of pop: 10
+pop position accuracy to JSON: 1.1472528
+height of pop accuracy to JSON: 0.0
+
+
+Run #8 (Normal)
+
+Blind mode: false
+Game mode: true
+Manual mode: false
+
+pushed at: 0
+pushed at: 90
+aligned board at: 96
+pushed at: 276
+X position of pop 456
+X velocity at pop: 9
+height of pop: 11
+pop position accuracy to JSON: 1.0021979
+height of pop accuracy to JSON: 0.0
+time of success: 149
+
+
+Run #9 (Blind)
+
+Blind mode: true
+Game mode: true
+Manual mode: false
+
+pushed at: 0
+pushed at: 66
+pushed at: 258
+aligned board at: 267
+X position of pop 456
+X velocity at pop: 9
+height of pop: 12
+pop position accuracy to JSON: 1.0021979
+height of pop accuracy to JSON: 0.0
+time of success: 142
+
+
+Run #10 (Blind)
+
+Blind mode: true
+Game mode: true
+Manual mode: false
+
+pushed at: 0
+pushed at: 66
+pushed at: 192
+aligned board at: 309
+pushed at: 390
+failed (collision at time: 79)
+X position of pop 522
+X velocity at pop: 12
+height of pop: 0
+pop position accuracy to JSON: 1.1472528
+height of pop accuracy to JSON: 0.0
+
+
+Run #11 (Blind)
+
+Blind mode: true
+Game mode: true
+Manual mode: false
+
+pushed at: 0
+pushed at: 69
+pushed at: 195
+failed (collision at time: 98)
+
+
+
+Total Runs (overall): 12
+Total runs (normal): 8
+Total runs (blind): 4
+Success rate (overall): 0.16666667
+Success rate (Normal): 0.125
+Success rate (Blind): 0.25
+Total time spent (Normal): 1072.0
+Total time spent (Blind): 142.0
+Avg time spent (Normal): 134.0
+Avg time spent (Blind): 35.0
+
+End of file

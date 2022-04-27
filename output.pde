@@ -13,6 +13,11 @@ int totalSuccessfulRunsBlind;
 
 int successfulBlindRuns;
 
+int totalTimeSpentUntilSuccess;
+int totalTimeSpentUntilSuccessBlind;
+boolean recordingTotalTime;
+boolean recordingTotalTimeBlind;
+
 
 void createNewFile() {
   // Create a new file in the sketch directory
@@ -20,10 +25,14 @@ void createNewFile() {
   output = createWriter("results/trial" + Integer.toString(totalFiles) + ".txt"); 
   totalFiles++;
   totalSimulatorRuns = 0;
-  totalSuccessfulRuns = 0;
-  totalSuccessfulRunsBlind = 0;
   totalNormalRuns = 0;
   totalBlindRuns = 0;
+  totalSuccessfulRuns = 0;
+  totalSuccessfulRunsBlind = 0;
+  totalTimeSpentUntilSuccess = 0;
+  totalTimeSpentUntilSuccessBlind = 0;
+  recordingTotalTime = true;
+  recordingTotalTimeBlind = true;
 }
 
 void writeToFile(String note) {

@@ -437,10 +437,37 @@ public void toggleRecordMode() {
       .setColorBackground(color(200, 210, 200));
 
   } else {
-    writeToFile("\n\n\nTotal Runs: " + str(totalSimulatorRuns));
-    writeToFile("Success rate (overall): " + str((float) totalSuccessfulRuns / totalSimulatorRuns));
-    writeToFile("Success rate (Normal: " + str((float) totalSuccessfulRuns / totalNormalRuns));
-    writeToFile("Success rate (Blind): " + str((float) totalSuccessfulRunsBlind / totalBlindRuns));
+
+
+
+    writeToFile("\n\n\nTotal Runs (overall): " + str(totalSimulatorRuns));
+    writeToFile("Total runs (normal): " + str(totalNormalRuns));
+    writeToFile("Total runs (blind): " + str(totalBlindRuns));
+
+    if (totalSimulatorRuns > 0) {
+      writeToFile("Success rate (overall): " + str((float) (totalSuccessfulRuns + totalSuccessfulRunsBlind) / totalSimulatorRuns));
+    }
+    if (totalNormalRuns > 0) {
+      writeToFile("Success rate (Normal): " + str((float) totalSuccessfulRuns / totalNormalRuns));
+    }
+    if (totalBlindRuns > 0) {
+      writeToFile("Success rate (Blind): " + str((float) totalSuccessfulRunsBlind / totalBlindRuns));
+    }
+
+
+
+
+
+    writeToFile("Total time spent (Normal): " + str((float) (totalTimeSpentUntilSuccess)));
+      writeToFile("Total time spent (Blind): " + str((float) (totalTimeSpentUntilSuccessBlind)));
+    if (totalNormalRuns > 0) {
+      writeToFile("Avg time spent (Normal): " + str((float) (totalTimeSpentUntilSuccess / totalNormalRuns)));
+    }
+    if (totalBlindRuns > 0) {
+      writeToFile("Avg time spent (Blind): " + str((float) (totalTimeSpentUntilSuccessBlind / totalBlindRuns)));
+    }
+
+
     writeToFile("\nEnd of file");
     closeFile();
 
@@ -574,6 +601,7 @@ public void runSimulator() {
     writeToFile("Manual mode: " + str(manualMode) + "\n");
 
     totalSimulatorRuns++;
+
   }
 
   // only allow sliders to be modified between runs
@@ -619,6 +647,13 @@ public void update() {
           writeToFile("failed (collision at time: " + str(time) + ")");
         }
       }
+
+      if (!blindMode && recordMode && recordingTotalTime) {
+        totalTimeSpentUntilSuccess += time;
+      }
+      if (blindMode && recordMode && recordingTotalTimeBlind) {
+        totalTimeSpentUntilSuccessBlind += time;
+      }
     }
 
 
@@ -639,8 +674,21 @@ public void update() {
   if (boardHasCleared && animationRunning && boardX > SCREEN_WIDTH && boardIsAligned) {
     ttsExamplePlayback("Success!");
     if (recordMode) {
-      totalSuccessfulRuns++;
+      if (blindMode) {
+        totalSuccessfulRuns++;
+      } else {
+        totalSuccessfulRunsBlind++;
+      }
       writeToFile("time of success: " + str(time));
+
+      if (!blindMode && recordMode && recordingTotalTime) {
+        totalTimeSpentUntilSuccess += time;
+        recordingTotalTime = false;
+      }
+      if (blindMode && recordMode && recordingTotalTimeBlind) {
+        totalTimeSpentUntilSuccessBlind += time;
+        recordingTotalTimeBlind = false;
+      }
     }
     back = backWin;
   } else if (boardHasCleared && animationRunning && boardX > SCREEN_WIDTH && !boardIsAligned) {
@@ -650,7 +698,16 @@ public void update() {
     
     if (recordMode) {
       writeToFile("failed (board not aligned)");
+
+      if (!blindMode && recordMode && recordingTotalTime) {
+        totalTimeSpentUntilSuccess += time;
+      }
+      if (blindMode && recordMode && recordingTotalTimeBlind) {
+        totalTimeSpentUntilSuccessBlind += time;
+      }
     }
+
+
   }
 
   // ending animation if board goes off screen
@@ -1239,7 +1296,7 @@ class Event {
       output += "skaterPushPower:                 " + getSkaterPushPower() + "\n";
       output += "skaterPopHeight:                 " + getSkaterPopHeight() + "\n";
       output += "skaterPopDistanceFromObstacle:   " + getSkaterPopDistanceFromObstacle() + "\n";
-      output += "skater initial alignment:        " + getSkaterInitialAlignment() + "\n";
+      output += "skaterInitialAlignment:        " + getSkaterInitialAlignment() + "\n";
       output += "obstacleThickness:               " + getObstacleThickness() + "\n";
       output += "obstacleHeight:                  " + getObstacleHeight() + "\n";
       output += "groundAngle:                     " + getGroundAngle() + "\n";
@@ -1289,6 +1346,11 @@ int totalSuccessfulRunsBlind;
 
 int successfulBlindRuns;
 
+int totalTimeSpentUntilSuccess;
+int totalTimeSpentUntilSuccessBlind;
+boolean recordingTotalTime;
+boolean recordingTotalTimeBlind;
+
 
 public void createNewFile() {
   // Create a new file in the sketch directory
@@ -1296,10 +1358,14 @@ public void createNewFile() {
   output = createWriter("results/trial" + Integer.toString(totalFiles) + ".txt"); 
   totalFiles++;
   totalSimulatorRuns = 0;
-  totalSuccessfulRuns = 0;
-  totalSuccessfulRunsBlind = 0;
   totalNormalRuns = 0;
   totalBlindRuns = 0;
+  totalSuccessfulRuns = 0;
+  totalSuccessfulRunsBlind = 0;
+  totalTimeSpentUntilSuccess = 0;
+  totalTimeSpentUntilSuccessBlind = 0;
+  recordingTotalTime = true;
+  recordingTotalTimeBlind = true;
 }
 
 public void writeToFile(String note) {
