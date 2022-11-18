@@ -8,4 +8,4 @@ This paper describes the methodologies and findings for my CS 4590 final project
 ## Documentation
 [Research Document](readme.pdf)
 
-[User Manual](readme.pdf)
+[User Manual](user-manual.pdf)
